@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script>
+    function addFoo() {
+        var spd_chart = document.getElementById("spdChart");
+        spd_chart.combatants.add({name: "Bar", speed: "4", dex: "21");
+    }
+</script>
+<button onclick="addFoo">Add Foo</button>
+<speed-chart id="spdChart">
+    <combatant-list>
+        <combatant-entry name="Foo" dex="13" speed="3"/>
+    </combatant-list>
+</speed-chart>
+</body>
+</html>

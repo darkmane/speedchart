@@ -1,0 +1,32 @@
+{
+  "name": "speed-chart",
+  "version": "1.0.0",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element providing a solution to no problem in particular.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "seed"
+  ],
+  "main": "speed-chart.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/darkmane/seed-element/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "paper-dialog": "PolymerElements/paper-dialog#~1.0.1",
+    "iron-collapse": "PolymerElements/iron-collapse#~1.0.3",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#~1.0.3"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}

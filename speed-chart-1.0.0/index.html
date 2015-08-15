@@ -1,0 +1,353 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="speed-chart-combatant.html">
+
+<!--
+An element providing a solution to no problem in particular.
+
+Example:
+
+    <speed-chart id="spdChart">
+        <speed-chart-combatant name="Foo" dex="13" speed="3"></speed-chart-combatant>
+    </speed-chart>
+
+@demo
+-->
+<dom-module id="speed-chart">
+
+    <style>
+        :host {
+            display: block;
+            box-sizing: border-box;
+        }
+
+        td {
+            margin: 0px;
+        }
+
+        .header td {
+            border: 1px solid;
+            text-align: center;
+        }
+
+        div {
+            border: 1px solid
+        }
+    </style>
+
+    <template>
+        <div>
+            <table>
+
+                <tr class="header">
+                    <td rowspan="2">Segment</td>
+                    <td colspan="12">Speed</td>
+                </tr>
+                <tr class="header">
+
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+
+
+                <tr id="seg1">
+
+                    <td>1</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg2">
+                    <td>2</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg3">
+                    <td>3</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg4">
+                    <td>4</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>3</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>&mdash;</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg5">
+                    <td>5</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>5</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>8</td>
+                    <td>&mdash;</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg6">
+                    <td>6</td>
+                    <td>&mdash;</td>
+                    <td>2</td>
+                    <td>&mdash;</td>
+                    <td>4</td>
+                    <td>&mdash;</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg7">
+                    <td>7</td>
+                    <td>1</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>7</td>
+                    <td>&mdash;</td>
+                    <td>9</td>
+                    <td>&mdash;</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg8">
+                    <td>8</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>3</td>
+                    <td>&mdash;</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>&mdash;</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg9">
+                    <td>9</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>4</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>&mdash;</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg10">
+                    <td>10</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg11">
+                    <td>11</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>&mdash;</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr id="seg12">
+                    <td>12</td>
+                    <td>&mdash;</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+
+            </table>
+            <div>
+                <template is="dom-repeat" items="{{current_combatants}}">
+                    <div>
+                        <div>{{item.name}}</div>
+                        <div>{{item.dex}}</div>
+                        <div>{{item.speed}}</div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+
+</dom-module>
+
+
+<script>
+
+
+    var spdChart = {
+        0: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        1: [12],
+        2: [6, 7, 8, 9, 10, 11, 12],
+        3: [4, 5, 8, 9, 10, 11, 12],
+        4: [3, 6, 7, 9, 10, 11, 12],
+        5: [5, 8, 10, 11, 12],
+        6: [2, 4, 6, 7, 8, 9, 10, 11, 12],
+        7: [1, 7, 9, 11, 12],
+        8: [3, 5, 6, 8, 9, 10, 11, 12],
+        9: [4, 7, 8, 10, 11, 12],
+        10: [5, 6, 9, 10, 11, 12],
+        11: [7, 8, 9, 10, 11, 12]
+    }
+
+    SpeedChart = Polymer({
+        is: 'speed-chart',
+        properties: {
+            combatants: {type: Array},
+            current_segment: {type: Number, readOnly: true, computed: 'currentSegment()'},
+            current_combatants: {type: Array, computed: 'currentCombatants()'},
+            _segment: {type: Number}
+
+        },
+
+        nextPhase: function () {
+            var phase = (this._segment + 1) % 12;
+            this.set('_segment', phase);
+        },
+
+        previousPhase: function () {
+            var phase = this._segment - 1;
+            if (phase < 0) {
+                phase = 11;
+            }
+            this.set('_segment', phase);
+        },
+
+        currentSegment: function () {
+            var seg = this._segment;
+            if (seg == 0) {
+                seg = 12;
+            }
+            return seg;
+        },
+
+        currentCombatants: function () {
+            var current = [];
+
+            for (var seg = 0; seg < spdChart[this._segment].length; seg++) {
+                var spd = spdChart[this._segment][seg];
+                for (var c = 0; c < this.combatants.length; c++) {
+                    if (this.combatants[c].speed == spd) {
+                        current.push(this.combatants[c]);
+                    }
+                }
+            }
+            current.sort(function (a, b) {
+                if (a.dex < b.dex) {
+                    return -1;
+                }
+                if (a.dex > b.dex) {
+                    return 1;
+                }
+                return 0;
+            });
+            return current;
+        },
+
+        ready: function () {
+            this.set('combatants', []);
+            this.set('_segment', 0);
+
+        },
+
+        Combatants: function () {
+            return this.$$('speed-chart-combatant');
+        }
+
+    });
+
+</script>
