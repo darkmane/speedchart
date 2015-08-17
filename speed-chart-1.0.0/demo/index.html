@@ -15,24 +15,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <title>speed-chart Demo</title>
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <link rel="import" href="../index.html">
-    <link rel="import" href="../speed-chart-combatant.html">
+    <script>
+    function addFoo() {
+        var spd_chart = document.getElementById("spdChart");
+
+        spd_chart.addCombatant({name: "Bar", speed: spd_chart.combatants.length + 1, dex: 21});
+    }
+</script>
 </head>
 <body>
 
 <p>An example of <code>&lt;speed-chart&gt;</code>:</p>
 
-<script>
-    function addFoo() {
-        var spd_chart = document.getElementById("spdChart");
-        spd_chart.nextPhase();
-        spd_chart.combatants.push({name: "Bar", speed: "4", dex: "21"});
-    }
-</script>
+
 <button onclick="addFoo()">Add Foo</button>
 
 <speed-chart id="spdChart">
-    <speed-chart-combatant name="Foo" dex="13" speed="3"></speed-chart-combatant>
-
 </speed-chart>
 
 </body>
