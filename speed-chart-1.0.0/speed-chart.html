@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <!--
 An element that provides a speed chart for Hero System games with basic combat order management tools.
@@ -33,12 +34,10 @@ Example:
             padding: 5px;
         }
 
-
-
         .combatant-row {
+            @apply(--layout-horizontal)
             display: flex;
             flex-flow: row nowrap;
-            justify-content: space-between;
         }
 
         .combatant-row div.name {
@@ -51,7 +50,7 @@ Example:
         }
 
         .cell {
-             padding: 2px;
+            padding: 2px;
         }
 
         .current {
@@ -274,12 +273,15 @@ Example:
 
                     </table>
                 </div>
-                <template is="dom-repeat" items="{{combatants}}" filter="isPhase"
-                          observe="combatants.*.speed _segment">
+                <div class="combatant-row">
+                    <paper-button> << previous</paper-button>
+                    <div>{{segment}}</div>
+                    <paper-button>next >></paper-button>
+                </div>
+                <template is="dom-repeat" items="{{combatants}}" filter="isPhase" sort="compareDexAndSpeed"
+                          observe="combatants.*.display">
                     <div class="combatant-row">
-                        <div class="name cell">{{item.name}}</div>
-                        <div class="cell">{{item.speed}}</div>
-                        <div class="cell">{{item.dex}}</div>
+                        <span>{{item.name}}</span>&nbsp;(SPD:&nbsp;<span>{{item.speed}}</span>,&nbsp;Dex:&nbsp;<span>{{item.dex}}</span>)
                     </div>
                 </template>
             </div>
@@ -297,46 +299,53 @@ Example:
                         return [];
                     }, notify: true
                 },
-                current_segment: {type: Number, readOnly: true, computed: 'currentSegment()'},
+                currentsegment: {type: Number, readOnly: true, computed: 'currentSegment()'},
                 current_combatants: {type: Array, readOnly: true, computed: 'currentCombatants()', notify: true},
-                _segment: {type: Number, value: -1}
+                segment: {type: Number, value: -1, observer: ''}
 
             },
 
             nextPhase: function () {
-                var phase = (this._segment + 1) % 12;
-                this.set('_segment', phase);
-                for (var i = 0; i < 12; i++) {
-                    if (this._segment === phase) {
-                        Polymer.toggleClass('current', true, this.$$('seg' + i));
-                    } else {
-                        Polymer.toggleClass('current', false, this.$$('seg' + i));
-                    }
-                }
+                var phase = (this.segment + 1) % 12;
+                this.set('segment', phase);
+                this.updateDisplay();
 
             },
 
             previousPhase: function () {
-                var phase = this._segment - 1;
+                var phase = this.segment - 1;
                 if (phase < 0) {
                     phase = 11;
                 }
-                this.set('_segment', phase);
-                for (var i = 0; i < 12; i++) {
-                    if (this._segment === phase) {
-                        Polymer.toggleClass('current', true, this.$$('seg' + i));
-                    } else {
-                        Polymer.toggleClass('current', false, this.$$('seg' + i));
-                    }
-                }
+                this.set('segment', phase);
+                this.updateDisplay();
             },
 
             formattedSegment: function () {
-                var seg = this._segment;
+                var seg = this.segment;
                 if (seg == 0) {
                     seg = 12;
                 }
+                if (seg == -1){
+                    seg = "Initial Action"
+                }
                 return seg;
+            },
+
+            updateDisplay: function () {
+                for (var j = 0; j < this.combatants.length; j++) {
+                    if (this.segment == -1) {
+                        this.combatants[j].display = true;
+                        continue;
+                    }
+                    
+                    for (var i = 0; i < this._spdChart[this.segment].length; i++) {
+                        this.combatants[j].display = false;
+                        if (this.combatants[j].speed == this._spdChart[this.segment][i]) {
+                            this.combatants[j].display = true;
+                        }
+                    }
+                }
             },
 
             ready: function () {
@@ -356,26 +365,10 @@ Example:
                     11: [7, 8, 9, 10, 11, 12]
                 };
 
-//             this.set('combatants', [{name: "Baz", dex: 13, speed: 3}]);
-//             this.set('_segment', 0);
-//             this.set('_spdChart', {
-//                 0: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-//                 1: [12],
-//                 2: [6, 7, 8, 9, 10, 11, 12],
-//                 3: [4, 5, 8, 9, 10, 11, 12],
-//                 4: [3, 6, 7, 9, 10, 11, 12],
-//                 5: [5, 8, 10, 11, 12],
-//                 6: [2, 4, 6, 7, 8, 9, 10, 11, 12],
-//                 7: [1, 7, 9, 11, 12],
-//                 8: [3, 5, 6, 8, 9, 10, 11, 12],
-//                 9: [4, 7, 8, 10, 11, 12],
-//                 10: [5, 6, 9, 10, 11, 12],
-//                 11: [7, 8, 9, 10, 11, 12]
-//             });
-
             },
 
             addCombatant: function (combatant) {
+                combatant.display = true;
                 this.push('combatants', combatant);
             },
 
@@ -385,15 +378,23 @@ Example:
             },
 
             isPhase: function (combatant) {
-                if (this._segment === -1)
-                    return true;
-                var speeds = this._spdChart[this._segment];
-                for (var i = 0; i < speeds.length; i++) {
-                    if (speeds[i] === combatant.speed) {
-                        return true;
-                    }
+                return combatant.display;
+            },
+
+            compareDexAndSpeed: function (c1, c2) {
+                if (c1.dex > c2.dex) {
+                    return -1
                 }
-                return false;
+                if (c1.dex < c2.dex) {
+                    return 1
+                }
+                if (c1.speed > c2.speed) {
+                    return -1
+                }
+                if (c1.speed < c2.speed) {
+                    return 1
+                }
+                return 0;
             }
         });
 
