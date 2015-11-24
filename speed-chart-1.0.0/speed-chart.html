@@ -273,13 +273,13 @@ Example:
 
                     </table>
                 </div>
-                <div class="combatant-row">
+                <div class="nagivation-row">
                     <paper-button> << previous</paper-button>
                     <div>{{segment}}</div>
                     <paper-button>next >></paper-button>
                 </div>
-                <template is="dom-repeat" items="{{combatants}}" filter="isPhase" sort="compareDexAndSpeed"
-                          observe="combatants.*.display">
+                <array-selector id="selector" items="{{combatants}}" selected="{{currentCombatants}}" multi></array-selector>
+                <template id="segmentCombatants" is="dom-repeat" items="{{currentCombatants}}" sort="compareDexAndSpeed">
                     <div class="combatant-row">
                         <span>{{item.name}}</span>&nbsp;(SPD:&nbsp;<span>{{item.speed}}</span>,&nbsp;Dex:&nbsp;<span>{{item.dex}}</span>)
                     </div>
@@ -299,7 +299,7 @@ Example:
                         return [];
                     }, notify: true
                 },
-                currentsegment: {type: Number, readOnly: true, computed: 'currentSegment()'},
+                currentsegment: {type: Number, readOnly: true, computed: 'formattedSegment()'},
                 current_combatants: {type: Array, readOnly: true, computed: 'currentCombatants()', notify: true},
                 segment: {type: Number, value: -1, observer: ''}
 
@@ -335,17 +335,21 @@ Example:
             updateDisplay: function () {
                 for (var j = 0; j < this.combatants.length; j++) {
                     if (this.segment == -1) {
-                        this.combatants[j].display = true;
-                        continue;
+                        this.$.selector.select(this.combatants[j]);
+                    }else {
+                        this.$.selector.deselect(this.combatants[j]);
                     }
-                    
-                    for (var i = 0; i < this._spdChart[this.segment].length; i++) {
-                        this.combatants[j].display = false;
-                        if (this.combatants[j].speed == this._spdChart[this.segment][i]) {
-                            this.combatants[j].display = true;
+                }
+                var segmentSpeeds = this._spdChart[this.segment];
+                for (var i = 0; i < segmentSpeeds.length; i++) {
+                    for(var j = 0; j < this.combatants.length; j++) {
+                        if (this.combatants[j].speed == segmentSpeeds[i]) {
+                            console.log(this.combatants[j]);
+                            this.$.selector.select(this.combatants[j]);
                         }
                     }
                 }
+
             },
 
             ready: function () {
@@ -370,6 +374,7 @@ Example:
             addCombatant: function (combatant) {
                 combatant.display = true;
                 this.push('combatants', combatant);
+                this.updateDisplay();
             },
 
             removeCombatant: function (combatant) {
