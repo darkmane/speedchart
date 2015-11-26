@@ -15,7 +15,7 @@
   ],
   "main": ["speed-chart.html"],
   "license": "MIT",
-  "homepage": "https://github.com/darkmane/webcomponents/",
+  "homepage": "https://github.com/darkmane/speedchart",
   "ignore": [
     "/test/",
     "/demo/"
