@@ -16,27 +16,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <link rel="import" href="../speed-chart.html">
     <script>
-    function addFoo() {
-        var spd_chart = document.getElementById("spdChart");
-
-        spd_chart.addCombatant({name: "Bar", speed: 4, dex: 21 + spd_chart.combatants.length});
-    }
-    function next() {
-        var spd_chart = document.getElementById("spdChart");
-
-        spd_chart.nextPhase();
-    }
-</script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var spd_chart = document.getElementById("spdChart");
+            for (var i = 1; i <= 12; i++) {
+                spd_chart.addCombatant({name: "Bar" + i, speed: i, dex: 21});
+            }
+        });
+    </script>
 </head>
 <body>
 
 <p>An example of <code>&lt;speed-chart&gt;</code>:</p>
 
-
-<button onclick="addFoo()">Add Foo</button>
-<button onclick="next()">Next</button>
+<div style="width: 400px">
 <speed-chart id="spdChart">
 </speed-chart>
-
+</div>
 </body>
 </html>

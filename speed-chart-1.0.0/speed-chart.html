@@ -25,7 +25,7 @@ Example:
 
     <style>
         :host {
-        @apply(--layout-vertical);
+        @apply(- -layout-vertical);
         }
 
         .container {
@@ -35,9 +35,20 @@ Example:
         }
 
         .combatant-row {
-            @apply(--layout-horizontal)
-            display: flex;
+        @apply(--layout-horizontal) display : flex;
             flex-flow: row nowrap;
+        }
+
+        .navigation-row {
+        @apply(- -layout-horizontal) display : flex;
+            flex-flow: row nowrap;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .navigation-row .middle {
+            flex-grow: 2;
+            text-align: center;
         }
 
         .combatant-row div.name {
@@ -49,16 +60,25 @@ Example:
             text-align: center;
         }
 
-        .cell {
-            padding: 2px;
-        }
-
         .current {
-            background-color: #f48fb1;
+
+            background-color: #f48fb1 !important;
         }
 
         .header td {
-            border: 1px solid;
+            border: 1px solid #d0d0d0;
+            background-color: #d0d0d0;
+        }
+
+        #seg2, #seg4, #seg6, #seg8, #seg10, #seg0 {
+            background-color: #d0d0d0;
+        }
+
+        .row table {
+            width: 100%;
+        }
+        #combatant-list {
+            padding: 5px;
         }
 
     </style>
@@ -255,7 +275,7 @@ Example:
                             <td>x</td>
                             <td>x</td>
                         </tr>
-                        <tr id="seg12">
+                        <tr id="seg0">
                             <td>12</td>
                             <td>&mdash;</td>
                             <td>x</td>
@@ -273,17 +293,21 @@ Example:
 
                     </table>
                 </div>
-                <div class="nagivation-row">
-                    <paper-button> << previous</paper-button>
-                    <div>{{segment}}</div>
-                    <paper-button>next >></paper-button>
+                <div class="navigation-row">
+                    <paper-button raised="true" id="back" on-click="previousPhase"> << back</paper-button>
+                    <div class="middle" id="formattedSegment">Initial Action</div>
+                    <paper-button raised="true" id="forward" on-click="nextPhase">next >></paper-button>
                 </div>
-                <array-selector id="selector" items="{{combatants}}" selected="{{currentCombatants}}" multi></array-selector>
-                <template id="segmentCombatants" is="dom-repeat" items="{{currentCombatants}}" sort="compareDexAndSpeed">
-                    <div class="combatant-row">
-                        <span>{{item.name}}</span>&nbsp;(SPD:&nbsp;<span>{{item.speed}}</span>,&nbsp;Dex:&nbsp;<span>{{item.dex}}</span>)
-                    </div>
-                </template>
+                <div id="combatant-list">
+                    <array-selector id="selector" items="{{combatants}}" selected="{{currentCombatants}}"
+                                    multi></array-selector>
+                    <template id="segmentCombatants" is="dom-repeat" items="{{currentCombatants}}"
+                              sort="compareDexAndSpeed">
+                        <div class="combatant-row">
+                            <span>{{item.name}}</span>&nbsp;(SPD:&nbsp;<span>{{item.speed}}</span>,&nbsp;Dex:&nbsp;<span>{{item.dex}}</span>)
+                        </div>
+                    </template>
+                </div>
             </div>
         </paper-material>
     </template>
@@ -299,8 +323,6 @@ Example:
                         return [];
                     }, notify: true
                 },
-                currentsegment: {type: Number, readOnly: true, computed: 'formattedSegment()'},
-                current_combatants: {type: Array, readOnly: true, computed: 'currentCombatants()', notify: true},
                 segment: {type: Number, value: -1, observer: ''}
 
             },
@@ -313,20 +335,17 @@ Example:
             },
 
             previousPhase: function () {
-                var phase = this.segment - 1;
-                if (phase < 0) {
-                    phase = 11;
-                }
+                var phase = (12 + this.segment - 1) % 12;
                 this.set('segment', phase);
                 this.updateDisplay();
             },
 
-            formattedSegment: function () {
-                var seg = this.segment;
+            formattedSegment: function (seg) {
+
                 if (seg == 0) {
                     seg = 12;
                 }
-                if (seg == -1){
+                if (seg == -1) {
                     seg = "Initial Action"
                 }
                 return seg;
@@ -336,20 +355,31 @@ Example:
                 for (var j = 0; j < this.combatants.length; j++) {
                     if (this.segment == -1) {
                         this.$.selector.select(this.combatants[j]);
-                    }else {
+                    } else {
                         this.$.selector.deselect(this.combatants[j]);
                     }
                 }
-                var segmentSpeeds = this._spdChart[this.segment];
-                for (var i = 0; i < segmentSpeeds.length; i++) {
-                    for(var j = 0; j < this.combatants.length; j++) {
-                        if (this.combatants[j].speed == segmentSpeeds[i]) {
-                            console.log(this.combatants[j]);
+
+                for (var i = 0; i < 12; i++) {
+                    this.toggleClass('current', false, this.$$("#seg" + i));
+                }
+
+                if (this.segment > -1) {
+                    var segmentSpeeds = this._spdChart[this.segment];
+                    var segmentMap = {};
+                    for (var i = 0; i < segmentSpeeds.length; i++) {
+                        segmentMap[segmentSpeeds[i]] = true;
+                    }
+
+                    for (var j = 0; j < this.combatants.length; j++) {
+                        if (this.combatants[j].speed in segmentMap) {
                             this.$.selector.select(this.combatants[j]);
                         }
                     }
-                }
+                    this.$.formattedSegment.innerText = this.formattedSegment(this.segment);
 
+                    this.toggleClass('current', true, this.$$("#seg" + this.segment));
+                }
             },
 
             ready: function () {
@@ -368,11 +398,10 @@ Example:
                     10: [5, 6, 9, 10, 11, 12],
                     11: [7, 8, 9, 10, 11, 12]
                 };
-
+                this.updateDisplay();
             },
 
             addCombatant: function (combatant) {
-                combatant.display = true;
                 this.push('combatants', combatant);
                 this.updateDisplay();
             },
@@ -382,9 +411,6 @@ Example:
                 this.splice('combatants', index, 1);
             },
 
-            isPhase: function (combatant) {
-                return combatant.display;
-            },
 
             compareDexAndSpeed: function (c1, c2) {
                 if (c1.dex > c2.dex) {
