@@ -1,14 +1,31 @@
 <!--
 @license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Sean Chitwood
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <!--
 An element that provides a speed chart for Hero System games with basic combat order management tools.
@@ -24,7 +41,7 @@ Example:
 
     <style>
         :host {
-        @apply(--layout-vertical);
+        @apply(- -layout-vertical);
         }
 
         .container {
@@ -33,12 +50,21 @@ Example:
             padding: 5px;
         }
 
-
-
         .combatant-row {
-            display: flex;
+        @apply(--layout-horizontal) display : flex;
             flex-flow: row nowrap;
-            justify-content: space-between;
+        }
+
+        .navigation-row {
+        @apply(- -layout-horizontal) display : flex;
+            flex-flow: row nowrap;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .navigation-row .middle {
+            flex-grow: 2;
+            text-align: center;
         }
 
         .combatant-row div.name {
@@ -50,16 +76,25 @@ Example:
             text-align: center;
         }
 
-        .cell {
-             padding: 2px;
-        }
-
         .current {
-            background-color: #f48fb1;
+
+            background-color: #f48fb1 !important;
         }
 
         .header td {
-            border: 1px solid;
+            border: 1px solid #d0d0d0;
+            background-color: #d0d0d0;
+        }
+
+        #seg2, #seg4, #seg6, #seg8, #seg10, #seg0 {
+            background-color: #d0d0d0;
+        }
+
+        .row table {
+            width: 100%;
+        }
+        #combatant-list {
+            padding: 5px;
         }
 
     </style>
@@ -256,7 +291,7 @@ Example:
                             <td>x</td>
                             <td>x</td>
                         </tr>
-                        <tr id="seg12">
+                        <tr id="seg0">
                             <td>12</td>
                             <td>&mdash;</td>
                             <td>x</td>
@@ -274,14 +309,21 @@ Example:
 
                     </table>
                 </div>
-                <template is="dom-repeat" items="{{combatants}}" filter="isPhase"
-                          observe="combatants.*.speed _segment">
-                    <div class="combatant-row">
-                        <div class="name cell">{{item.name}}</div>
-                        <div class="cell">{{item.speed}}</div>
-                        <div class="cell">{{item.dex}}</div>
-                    </div>
-                </template>
+                <div class="navigation-row">
+                    <paper-button raised="true" id="back" on-click="previousPhase"> << back</paper-button>
+                    <div class="middle" id="formattedSegment">Initial Action</div>
+                    <paper-button raised="true" id="forward" on-click="nextPhase">next >></paper-button>
+                </div>
+                <div id="combatant-list">
+                    <array-selector id="selector" items="{{combatants}}" selected="{{currentCombatants}}"
+                                    multi></array-selector>
+                    <template id="segmentCombatants" is="dom-repeat" items="{{currentCombatants}}"
+                              sort="compareDexAndSpeed">
+                        <div class="combatant-row">
+                            <span>{{item.name}}</span>&nbsp;(SPD:&nbsp;<span>{{item.speed}}</span>,&nbsp;Dex:&nbsp;<span>{{item.dex}}</span>)
+                        </div>
+                    </template>
+                </div>
             </div>
         </paper-material>
     </template>
@@ -297,46 +339,63 @@ Example:
                         return [];
                     }, notify: true
                 },
-                current_segment: {type: Number, readOnly: true, computed: 'currentSegment()'},
-                current_combatants: {type: Array, readOnly: true, computed: 'currentCombatants()', notify: true},
-                _segment: {type: Number, value: -1}
+                segment: {type: Number, value: -1, observer: ''}
 
             },
 
             nextPhase: function () {
-                var phase = (this._segment + 1) % 12;
-                this.set('_segment', phase);
-                for (var i = 0; i < 12; i++) {
-                    if (this._segment === phase) {
-                        Polymer.toggleClass('current', true, this.$$('seg' + i));
-                    } else {
-                        Polymer.toggleClass('current', false, this.$$('seg' + i));
-                    }
-                }
+                var phase = (this.segment + 1) % 12;
+                this.set('segment', phase);
+                this.updateDisplay();
 
             },
 
             previousPhase: function () {
-                var phase = this._segment - 1;
-                if (phase < 0) {
-                    phase = 11;
-                }
-                this.set('_segment', phase);
-                for (var i = 0; i < 12; i++) {
-                    if (this._segment === phase) {
-                        Polymer.toggleClass('current', true, this.$$('seg' + i));
-                    } else {
-                        Polymer.toggleClass('current', false, this.$$('seg' + i));
-                    }
-                }
+                var phase = (12 + this.segment - 1) % 12;
+                this.set('segment', phase);
+                this.updateDisplay();
             },
 
-            formattedSegment: function () {
-                var seg = this._segment;
+            formattedSegment: function (seg) {
+
                 if (seg == 0) {
                     seg = 12;
                 }
+                if (seg == -1) {
+                    seg = "Initial Action"
+                }
                 return seg;
+            },
+
+            updateDisplay: function () {
+                for (var j = 0; j < this.combatants.length; j++) {
+                    if (this.segment == -1) {
+                        this.$.selector.select(this.combatants[j]);
+                    } else {
+                        this.$.selector.deselect(this.combatants[j]);
+                    }
+                }
+
+                for (var i = 0; i < 12; i++) {
+                    this.toggleClass('current', false, this.$$("#seg" + i));
+                }
+
+                if (this.segment > -1) {
+                    var segmentSpeeds = this._spdChart[this.segment];
+                    var segmentMap = {};
+                    for (var i = 0; i < segmentSpeeds.length; i++) {
+                        segmentMap[segmentSpeeds[i]] = true;
+                    }
+
+                    for (var j = 0; j < this.combatants.length; j++) {
+                        if (this.combatants[j].speed in segmentMap) {
+                            this.$.selector.select(this.combatants[j]);
+                        }
+                    }
+                    this.$.formattedSegment.innerText = this.formattedSegment(this.segment);
+
+                    this.toggleClass('current', true, this.$$("#seg" + this.segment));
+                }
             },
 
             ready: function () {
@@ -355,28 +414,12 @@ Example:
                     10: [5, 6, 9, 10, 11, 12],
                     11: [7, 8, 9, 10, 11, 12]
                 };
-
-//             this.set('combatants', [{name: "Baz", dex: 13, speed: 3}]);
-//             this.set('_segment', 0);
-//             this.set('_spdChart', {
-//                 0: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-//                 1: [12],
-//                 2: [6, 7, 8, 9, 10, 11, 12],
-//                 3: [4, 5, 8, 9, 10, 11, 12],
-//                 4: [3, 6, 7, 9, 10, 11, 12],
-//                 5: [5, 8, 10, 11, 12],
-//                 6: [2, 4, 6, 7, 8, 9, 10, 11, 12],
-//                 7: [1, 7, 9, 11, 12],
-//                 8: [3, 5, 6, 8, 9, 10, 11, 12],
-//                 9: [4, 7, 8, 10, 11, 12],
-//                 10: [5, 6, 9, 10, 11, 12],
-//                 11: [7, 8, 9, 10, 11, 12]
-//             });
-
+                this.updateDisplay();
             },
 
             addCombatant: function (combatant) {
                 this.push('combatants', combatant);
+                this.updateDisplay();
             },
 
             removeCombatant: function (combatant) {
@@ -384,16 +427,21 @@ Example:
                 this.splice('combatants', index, 1);
             },
 
-            isPhase: function (combatant) {
-                if (this._segment === -1)
-                    return true;
-                var speeds = this._spdChart[this._segment];
-                for (var i = 0; i < speeds.length; i++) {
-                    if (speeds[i] === combatant.speed) {
-                        return true;
-                    }
+
+            compareDexAndSpeed: function (c1, c2) {
+                if (c1.dex > c2.dex) {
+                    return -1
                 }
-                return false;
+                if (c1.dex < c2.dex) {
+                    return 1
+                }
+                if (c1.speed > c2.speed) {
+                    return -1
+                }
+                if (c1.speed < c2.speed) {
+                    return 1
+                }
+                return 0;
             }
         });
 

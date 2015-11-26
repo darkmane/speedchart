@@ -15,7 +15,7 @@
   ],
   "main": "speed-chart.html",
   "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/darkmane/seed-element/",
+  "homepage": "https://github.com/darkmane/webcomponents/",
   "ignore": [
     "/.*",
     "/test/",

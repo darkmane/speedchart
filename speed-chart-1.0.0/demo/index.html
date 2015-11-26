@@ -14,24 +14,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
     <title>speed-chart Demo</title>
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="../index.html">
+    <link rel="import" href="../speed-chart.html">
     <script>
-    function addFoo() {
-        var spd_chart = document.getElementById("spdChart");
-
-        spd_chart.addCombatant({name: "Bar", speed: spd_chart.combatants.length + 1, dex: 21});
-    }
-</script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var spd_chart = document.getElementById("spdChart");
+            for (var i = 1; i <= 12; i++) {
+                spd_chart.addCombatant({name: "Bar" + i, speed: i, dex: 21});
+            }
+        });
+    </script>
 </head>
 <body>
 
 <p>An example of <code>&lt;speed-chart&gt;</code>:</p>
 
-
-<button onclick="addFoo()">Add Foo</button>
-
+<div style="width: 400px">
 <speed-chart id="spdChart">
 </speed-chart>
-
+</div>
 </body>
 </html>
