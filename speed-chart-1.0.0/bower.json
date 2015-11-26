@@ -13,11 +13,10 @@
     "rpg",
     "hero-system"
   ],
-  "main": "speed-chart.html",
-  "license": "http://polymer.github.io/LICENSE.txt",
+  "main": ["speed-chart.html"],
+  "license": "MIT",
   "homepage": "https://github.com/darkmane/webcomponents/",
   "ignore": [
-    "/.*",
     "/test/",
     "/demo/"
   ],
